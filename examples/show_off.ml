@@ -1,3 +1,2 @@
-
 let () =
-  Linenoise.test ()
+  LNoise.print_keycodes ()

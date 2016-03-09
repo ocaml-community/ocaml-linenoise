@@ -1,3 +1,4 @@
+#define CAML_NAME_SPACE
 //Standard C
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,8 +16,16 @@
 
 #include "linenoise.h"
 
-CAMLprim value foo(value junk)
+CAMLprim value ml_clearscreen(void)
 {
-  printf("Called from OCaml\n");
-  return Val_unit;
+  CAMLparam0();
+  linenoiseClearScreen();
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value ml_printkeycodes(void)
+{
+  CAMLparam0();
+  linenoisePrintKeyCodes();
+  CAMLreturn(Val_unit);
 }
