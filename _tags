@@ -1,3 +1,0 @@
-# -*- conf -*-
-"examples": not_hygienic
-true: debug, annot, bin_annot
