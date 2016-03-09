@@ -1,0 +1,12 @@
+_build
+*.docdir
+
+*.cmi
+*.cmt
+*.cmo
+*.cma
+*.cmx
+*.o
+
+setup.data
+setup.log

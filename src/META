@@ -1,0 +1,11 @@
+# OASIS_START
+# DO NOT EDIT (digest: c5cc70941031087fa77d5307fb63789e)
+version = "1.0"
+description = "Simple readline like functionality"
+archive(byte) = "linenoise.cma"
+archive(byte, plugin) = "linenoise.cma"
+archive(native) = "linenoise.cmxa"
+archive(native, plugin) = "linenoise.cmxs"
+exists_if = "linenoise.cma"
+# OASIS_STOP
+

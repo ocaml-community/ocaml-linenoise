@@ -1,0 +1,27 @@
+# -*- conf -*-
+OASISFormat: 0.4
+Name:        linenoise
+Version:     1.0
+Synopsis:    Simple readline like functionality
+Authors:     Edgar Aroutiounian <edgar.factorial@gmail.com>
+Maintainers: Edgar Aroutiounian <edgar.factorial@gmail.com>
+Homepage:    https://github.com/fxfactorial/ocaml-linenoise
+License:     BSD-3-clause
+Plugins:     META (0.4), DevFiles (0.4)
+BuildTools:  ocamlbuild
+
+Description: Simple readline like functionality
+
+Library linenoise
+  Path: src
+  install: true
+  CClib: -L/usr/local/lib
+  CCOpt: -g -Wextra -Wall -std=c99 -I/usr/local/include
+  Modules: Linenoise
+  CompiledObject: best
+  CSources: linenoise.c, linenoise.h, linenoise_stubs.c
+
+SourceRepository master
+  Type:     git
+  Location: https://github.com/fxfactorial/ocaml-linenoise/.git
+  Browser:  https://github.com/fxfactorial/ocaml-linenoise
