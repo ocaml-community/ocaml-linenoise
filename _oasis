@@ -17,7 +17,9 @@ Library linenoise
   install: true
   CCOpt: -g -Wextra -Wall -std=c99 -I/usr/local/include
   Modules: LNoise
-  CSources:  linenoise.h, linenoise.c, linenoise_stubs.c
+  CSources:
+    linenoise_src.h, linenoise_src.c,
+    linenoise_stubs.c
 
 SourceRepository master
   Type:     git

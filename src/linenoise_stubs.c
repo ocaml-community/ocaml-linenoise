@@ -14,7 +14,7 @@
 #include <caml/callback.h>
 #include <caml/signals.h>
 
-#include "linenoise.h"
+#include "linenoise_src.h"
 
 CAMLprim value ml_clearscreen(void)
 {
