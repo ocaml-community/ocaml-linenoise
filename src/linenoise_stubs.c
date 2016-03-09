@@ -16,6 +16,20 @@
 
 #include "linenoise_src.h"
 
+CAMLprim value ml_add_completion(value completions)
+{
+  CAMLparam1(completions);
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value ml_set_completion_cb(value callback)
+{
+  CAMLparam1(callback);
+
+  CAMLreturn(Val_unit);
+}
+
 CAMLprim value ml_linenoise(value prompt)
 {
   CAMLparam1(prompt);
@@ -51,6 +65,13 @@ CAMLprim value ml_clearscreen(void)
 {
   CAMLparam0();
   linenoiseClearScreen();
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value ml_set_multiline(value use_multiline)
+{
+  CAMLparam1(use_multiline);
+  linenoiseSetMultiLine(Bool_val(use_multiline));
   CAMLreturn(Val_unit);
 }
 
