@@ -16,6 +16,37 @@
 
 #include "linenoise_src.h"
 
+CAMLprim value ml_linenoise(value prompt)
+{
+  CAMLparam1(prompt);
+  const char *fn = caml_strdup(String_val(prompt));
+  CAMLreturn(caml_copy_string("42"));
+}
+
+CAMLprim value ml_history_add(value line)
+{
+  CAMLparam1(line);
+  CAMLreturn(linenoiseHistoryAdd(caml_strdup(String_val(line))));
+}
+
+CAMLprim value ml_history_set_maxlen(value max)
+{
+  CAMLparam1(max);
+  CAMLreturn(caml_copy_nativeint(linenoiseHistorySetMaxLen(Int_val(max))));
+}
+
+CAMLprim value ml_history_save(value filename)
+{
+  CAMLparam1(filename);
+  CAMLreturn(linenoiseHistorySave(caml_strdup(String_val(filename))));
+}
+
+CAMLprim value ml_history_load(value filename)
+{
+  CAMLparam1(filename);
+  CAMLreturn(linenoiseHistoryLoad(caml_strdup(String_val(filename))));
+}
+
 CAMLprim value ml_clearscreen(void)
 {
   CAMLparam0();
@@ -29,3 +60,4 @@ CAMLprim value ml_printkeycodes(void)
   linenoisePrintKeyCodes();
   CAMLreturn(Val_unit);
 }
+
