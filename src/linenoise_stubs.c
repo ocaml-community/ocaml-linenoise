@@ -29,16 +29,27 @@ static value Val_some(value v)
   CAMLreturn(some);
 }
 
-CAMLprim value ml_add_completion(value completions)
+CAMLprim value ml_add_completion(value completions, value new_completion)
 {
-  CAMLparam1(completions);
-
+  CAMLparam2(completions, new_completion);
+  linenoiseAddCompletion((linenoiseCompletions *)completions,
+			 caml_strdup(String_val(new_completion)));
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value ml_set_completion_cb(value callback)
+static value cb;
+
+static void bridge(const char *buf, linenoiseCompletions *lc)
 {
-  CAMLparam1(callback);
+  caml_callback2(cb, caml_copy_string(buf), (value)lc);
+  return;
+}
+
+CAMLprim value ml_set_completion_cb(value completions)
+{
+  CAMLparam1(completions);
+  cb = completions;
+  linenoiseSetCompletionCallback(bridge);
   CAMLreturn(Val_unit);
 }
 
