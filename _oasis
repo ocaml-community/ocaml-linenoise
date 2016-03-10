@@ -1,7 +1,7 @@
 # -*- conf -*-
 OASISFormat: 0.4
 Name:        linenoise
-Version:     1.0
+Version:     0.9.0
 Synopsis:    Simple readline like functionality
 Authors:     Edgar Aroutiounian <edgar.factorial@gmail.com>
 Maintainers: Edgar Aroutiounian <edgar.factorial@gmail.com>
