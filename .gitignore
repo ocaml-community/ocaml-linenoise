@@ -1,6 +1,7 @@
 _build
 *.docdir
 
+history.txt
 *.cmi
 *.cmt
 *.cmo
