@@ -3,7 +3,7 @@ Simple readline like functionality
 These are self contained OCaml bindings to linenoise,
 no system libraries needed at all.
 
-Here's the simpliest program:
+Here's the simplest program:
 
 let rec user_input prompt cb =
   match LNoise.linenoise prompt with
