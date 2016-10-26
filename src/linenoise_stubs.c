@@ -35,15 +35,16 @@ static void completion_bridge(const char *buf, linenoiseCompletions *lc)
 
 static char *hints_bridge(const char *buf, int *color, int *bold)
 {
+  CAMLparam0();
   CAMLlocal1(cb_result);
   cb_result = caml_callback(hints_cb, caml_copy_string(buf));
   if (cb_result == Val_none) {
-    return NULL;
+    CAMLreturnT(char *,NULL);
   } else {
-    const char *msg = caml_strdup(String_val(Field(Field(cb_result, 0), 0)));
+    char *msg = caml_strdup(String_val(Field(Field(cb_result, 0), 0)));
     *color = Int_val(Field(Field(cb_result, 0), 1)) + 31;
     *bold = Bool_val(Field(Field(cb_result, 0), 2));
-    return (char *)msg;
+    CAMLreturnT(char *,msg);
   }
 }
 
