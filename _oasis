@@ -1,5 +1,6 @@
 # -*- conf -*-
 OASISFormat: 0.4
+OCamlVersion: >= 4.03.0
 Name:        linenoise
 Version:     1.0.0
 Synopsis:    Simple readline like functionality

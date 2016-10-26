@@ -1,11 +1,12 @@
-(** OCaml bindings to linenoise. *)
+(** OCaml bindings to linenoise, functions that can fail use result
+    type *)
 
 (** Abstract type of completions, given to your completion callback *)
 type completions
 
 (** This function is used by the callback function registered by the
     user in order to add completion options given the input string
-    when the user typed <tab>. *)
+    when the user typed <TAB>. *)
 val add_completion : completions -> string -> unit
 
 (** Register the callback function that is called for upon
@@ -21,29 +22,25 @@ val set_completion_callback : (string -> completions -> unit) -> unit
 val linenoise : string -> string option
 
 (** Add a string to the history *)
-val history_add : string -> int
+val history_add : string -> (unit, string) result
 
 (** Set the maximum length for the history. This function can be
     called even if there is already some history, the function will
     make sure to retain just the latest 'len' elements if the new
     history length value is smaller than the amount of items already
     inside the history. *)
-val history_set : max_length:int -> int
+val history_set : max_length:int -> (unit, string) result
 
-(** Save the history in the specified file. On success 0 is returned
-    otherwise -1 is returned. *)
-val history_save : filename:string -> int
+(** Save the history in the specified file *)
+val history_save : filename:string -> (unit, string) result
 
-(** Load the history from the specified file. If the file does not
-    exist zero is returned and no operation is performed.  If the file
-    exists and the operation succeeded 0 is returned, otherwise on
-    error -1 is returned. *)
-val history_load : filename:string -> int
+(** Load the history from the specified file. *)
+val history_load : filename:string -> (unit, string) result
 
-(** Clear the screen. Used to handle ctrl+l *)
+(** Clear the screen; used to handle CTRL+L *)
 val clear_screen : unit -> unit
 
-(** Set if to use or not the multi line mode. *)
+(** Set if to use or not use the multi line mode. *)
 val set_multiline : bool -> unit
 
 (** This special mode is used by linenoise in order to print scan
