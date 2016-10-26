@@ -14,3 +14,7 @@ external history_load : filename:string -> int = "ml_history_load"
 external clear_screen : unit -> unit = "ml_clearscreen"
 external set_multiline : bool -> unit = "ml_set_multiline"
 external print_keycodes : unit -> unit = "ml_printkeycodes"
+
+type hint_color = Red | Green | Yellow | Blue | Magenta | Cyan | White
+external set_hints_callback :
+  (string -> (string * hint_color * bool) option) -> unit = "ml_set_hints_cb"

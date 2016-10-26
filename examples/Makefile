@@ -5,4 +5,4 @@ all:
 	@./T
 
 clean:
-	rm -rf *.o *.c*
+	@rm -rf *.o *.c* T history.txt

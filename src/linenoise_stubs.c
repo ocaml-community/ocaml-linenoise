@@ -37,29 +37,56 @@ CAMLprim value ml_add_completion(value completions, value new_completion)
   CAMLreturn(Val_unit);
 }
 
-static value cb;
+static value completion_cb, hints_cb;
 
-static void bridge(const char *buf, linenoiseCompletions *lc)
+static void completion_bridge(const char *buf, linenoiseCompletions *lc)
 {
-  caml_callback2(cb, caml_copy_string(buf), (value)lc);
-  return;
+  caml_callback2(completion_cb, caml_copy_string(buf), (value)lc);
 }
+
+static char *hints_bridge(const char *buf, int *color, int *bold)
+{
+  CAMLlocal1(cb_result);
+  cb_result = caml_callback(hints_cb, caml_copy_string(buf));
+  if (cb_result == Val_none) {
+    return NULL;
+  } else {
+    const char *msg = caml_strdup(String_val(Field(Field(cb_result, 0), 0)));
+    *color = Int_val(Field(Field(cb_result, 0), 1)) + 31;
+    *bold = Bool_val(Field(Field(cb_result, 0), 2));
+    return (char *)msg;
+  }
+}
+
+__attribute__((constructor))
+void set_free_hints(void) { linenoiseSetFreeHintsCallback(free); }
 
 CAMLprim value ml_set_completion_cb(value completions)
 {
   CAMLparam1(completions);
-  cb = completions;
-  linenoiseSetCompletionCallback(bridge);
+  completion_cb = completions;
+  linenoiseSetCompletionCallback(completion_bridge);
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value ml_set_hints_cb(value hints)
+{
+  CAMLparam1(hints);
+  hints_cb = hints;
+  linenoiseSetHintsCallback(hints_bridge);
+  CAMLreturn(Val_unit);
+}
+
 
 CAMLprim value ml_linenoise(value prompt)
 {
   CAMLparam1(prompt);
+  CAMLlocal1(lnoise_result);
   const char *result = linenoise(caml_strdup(String_val(prompt)));
-  if (!result)
-    CAMLreturn(Val_none);
-  CAMLreturn(Val_some(caml_copy_string(result)));
+  if (!result) CAMLreturn(Val_none);
+  lnoise_result = caml_copy_string(result);
+  linenoiseFree((void*)result);
+  CAMLreturn(Val_some(lnoise_result));
 }
 
 CAMLprim value ml_history_add(value line)
@@ -86,7 +113,7 @@ CAMLprim value ml_history_load(value filename)
   CAMLreturn(linenoiseHistoryLoad(caml_strdup(String_val(filename))));
 }
 
-CAMLprim value ml_clearscreen(void)
+CAMLprim value ml_clearscreen(__attribute__((unused))value unit)
 {
   CAMLparam0();
   linenoiseClearScreen();

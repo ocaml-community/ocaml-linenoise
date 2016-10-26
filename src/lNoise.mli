@@ -49,3 +49,15 @@ val set_multiline : bool -> unit
 (** This special mode is used by linenoise in order to print scan
     codes on screen for debugging / development purposes. *)
 val print_keycodes : unit -> unit
+
+(** What color you want the hints to be. *)
+type hint_color = Red | Green | Yellow | Blue | Magenta | Cyan | White
+
+(** Set a hints callback, callback gets a string, aka the line input,
+    and you get a chance to give a hint to the user. Example, imagine
+    if user types git remote add, then you can give a hint of <this is
+    where you add a remote name> <this is where you add the remote's
+    URL>, see animated gif in source repo for clear example. Returned
+    tuple represents the hint message, color, and whether it ought to
+    be bold. *)
+val set_hints_callback : (string -> (string * hint_color * bool) option) -> unit

@@ -17,6 +17,8 @@ Library linenoise
   Path: src
   install: true
   Modules: LNoise
+  ByteOpt: -w +a-4-40..42-44-45-48
+  NativeOpt: -w +a-4-40..42-44-45-48 -O2
   CSources:
     linenoise_src.h, linenoise_src.c,
     linenoise_stubs.c

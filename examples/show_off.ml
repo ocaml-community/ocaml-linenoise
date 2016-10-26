@@ -7,6 +7,12 @@ let rec user_input prompt cb =
 
 let () =
   (* LNoise.set_multiline true; *)
+  LNoise.set_hints_callback (fun line ->
+      if line <> "git remote add " then None
+      else Some (" <this is the remote name> <this is the remote URL>",
+                 LNoise.Yellow,
+                 true)
+    );
   LNoise.history_load ~filename:"history.txt" |> ignore;
   LNoise.history_set ~max_length:100 |> ignore;
   LNoise.set_completion_callback begin fun line_so_far ln_completions ->
