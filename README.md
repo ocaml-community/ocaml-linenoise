@@ -24,8 +24,8 @@ documentation [here](http://hyegar.com/ocaml-linenoise/LNoise.html)
 # Example code
 This example is also included in the repo under examples:
 
-<p align="center" style='width:100%'> 
-  <img style='width:100%' src='example.gif'/> 
+<p align="center" style='min-width:100%'> 
+  <img style='min-width:100%' src='example.gif'/> 
 </p>
 
 
