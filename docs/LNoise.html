@@ -16,7 +16,8 @@
 <h1>Module <a href="type_LNoise.html">LNoise</a></h1>
 
 <pre><span class="keyword">module</span> LNoise: <code class="code"><span class="keyword">sig</span></code> <a href="LNoise.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><div class="info module top">
-OCaml bindings to linenoise.<br>
+OCaml bindings to linenoise, functions that can fail use result
+    type<br>
 </div>
 <hr width="100%">
 
@@ -29,7 +30,7 @@ Abstract type of completions, given to your completion callback<br>
 <pre><span id="VALadd_completion"><span class="keyword">val</span> add_completion</span> : <code class="type"><a href="LNoise.html#TYPEcompletions">completions</a> -> string -> unit</code></pre><div class="info ">
 This function is used by the callback function registered by the
     user in order to add completion options given the input string
-    when the user typed &lt;tab&gt;.<br>
+    when the user typed &lt;TAB&gt;.<br>
 </div>
 
 <pre><span id="VALset_completion_callback"><span class="keyword">val</span> set_completion_callback</span> : <code class="type">(string -> <a href="LNoise.html#TYPEcompletions">completions</a> -> unit) -> unit</code></pre><div class="info ">
@@ -46,11 +47,11 @@ The high level function that is the main API of the linenoise
     most desperate of the conditions.<br>
 </div>
 
-<pre><span id="VALhistory_add"><span class="keyword">val</span> history_add</span> : <code class="type">string -> int</code></pre><div class="info ">
+<pre><span id="VALhistory_add"><span class="keyword">val</span> history_add</span> : <code class="type">string -> (unit, string) result</code></pre><div class="info ">
 Add a string to the history<br>
 </div>
 
-<pre><span id="VALhistory_set"><span class="keyword">val</span> history_set</span> : <code class="type">max_length:int -> int</code></pre><div class="info ">
+<pre><span id="VALhistory_set"><span class="keyword">val</span> history_set</span> : <code class="type">max_length:int -> (unit, string) result</code></pre><div class="info ">
 Set the maximum length for the history. This function can be
     called even if there is already some history, the function will
     make sure to retain just the latest 'len' elements if the new
@@ -58,28 +59,90 @@ Set the maximum length for the history. This function can be
     inside the history.<br>
 </div>
 
-<pre><span id="VALhistory_save"><span class="keyword">val</span> history_save</span> : <code class="type">filename:string -> int</code></pre><div class="info ">
-Save the history in the specified file. On success 0 is returned
-    otherwise -1 is returned.<br>
+<pre><span id="VALhistory_save"><span class="keyword">val</span> history_save</span> : <code class="type">filename:string -> (unit, string) result</code></pre><div class="info ">
+Save the history in the specified file<br>
 </div>
 
-<pre><span id="VALhistory_load"><span class="keyword">val</span> history_load</span> : <code class="type">filename:string -> int</code></pre><div class="info ">
-Load the history from the specified file. If the file does not
-    exist zero is returned and no operation is performed.  If the file
-    exists and the operation succeeded 0 is returned, otherwise on
-    error -1 is returned.<br>
+<pre><span id="VALhistory_load"><span class="keyword">val</span> history_load</span> : <code class="type">filename:string -> (unit, string) result</code></pre><div class="info ">
+Load the history from the specified file.<br>
 </div>
 
 <pre><span id="VALclear_screen"><span class="keyword">val</span> clear_screen</span> : <code class="type">unit -> unit</code></pre><div class="info ">
-Clear the screen. Used to handle ctrl+l<br>
+Clear the screen; used to handle CTRL+L<br>
 </div>
 
 <pre><span id="VALset_multiline"><span class="keyword">val</span> set_multiline</span> : <code class="type">bool -> unit</code></pre><div class="info ">
-Set if to use or not the multi line mode.<br>
+Set if to use or not use the multi line mode.<br>
 </div>
 
 <pre><span id="VALprint_keycodes"><span class="keyword">val</span> print_keycodes</span> : <code class="type">unit -> unit</code></pre><div class="info ">
 This special mode is used by linenoise in order to print scan
     codes on screen for debugging / development purposes.<br>
+</div>
+
+<pre><code><span id="TYPEhint_color"><span class="keyword">type</span> <code class="type"></code>hint_color</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELThint_color.Red"><span class="constructor">Red</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELThint_color.Green"><span class="constructor">Green</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELThint_color.Yellow"><span class="constructor">Yellow</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELThint_color.Blue"><span class="constructor">Blue</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELThint_color.Magenta"><span class="constructor">Magenta</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELThint_color.Cyan"><span class="constructor">Cyan</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELThint_color.White"><span class="constructor">White</span></span></code></td>
+
+</tr></table>
+
+<div class="info ">
+What color you want the hints to be.<br>
+</div>
+
+
+<pre><span id="VALset_hints_callback"><span class="keyword">val</span> set_hints_callback</span> : <code class="type">(string -> (string * <a href="LNoise.html#TYPEhint_color">hint_color</a> * bool) option) -> unit</code></pre><div class="info ">
+Set a hints callback, callback gets a string, aka the line input,
+    and you get a chance to give a hint to the user. Example, imagine
+    if user types git remote add, then you can give a hint of &lt;this is
+    where you add a remote name&gt; &lt;this is where you add the remote's
+    URL&gt;, see animated gif in source repo for clear example. Returned
+    tuple represents the hint message, color, and whether it ought to
+    be bold.<br>
 </div>
 </body></html>
