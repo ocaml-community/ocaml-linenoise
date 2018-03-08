@@ -132,6 +132,8 @@ static int history_max_len = LINENOISE_DEFAULT_HISTORY_MAX_LEN;
 static int history_len = 0;
 static char **history = NULL;
 
+int linenoiseWasInterrupted = 0;
+
 /* The linenoiseState structure represents the state during line editing.
  * We pass this state to functions implementing specific editing
  * functionalities. */
@@ -827,6 +829,7 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
             return (int)l.len;
         case CTRL_C:     /* ctrl-c */
             errno = EAGAIN;
+            linenoiseWasInterrupted = 1;
             return -1;
         case BACKSPACE:   /* backspace */
         case 8:     /* ctrl-h */

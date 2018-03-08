@@ -2,7 +2,9 @@
 #include <caml/alloc.h>
 #include <caml/memory.h>
 #include <caml/callback.h>
+#include <caml/fail.h>
 
+#include <errno.h>
 #include "linenoise_src.h"
 
 // Ripped from ctypes
@@ -16,6 +18,16 @@ static value Val_some(value v)
   some = caml_alloc(1, 0);
   Store_field(some, 0, v);
   CAMLreturn(some);
+}
+
+/* if true, raise Sys.Break on ctrl-c */
+static int raise_sys_break = 0;
+
+CAMLprim value ml_catch_break(value flag)
+{
+  CAMLparam1(flag);
+  raise_sys_break = Bool_val(flag);
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value ml_add_completion(value completions, value new_completion)
@@ -72,8 +84,15 @@ CAMLprim value ml_linenoise(value prompt)
 {
   CAMLparam1(prompt);
   CAMLlocal1(lnoise_result);
+  linenoiseWasInterrupted = 0; // reset
   const char *result = linenoise(caml_strdup(String_val(prompt)));
-  if (!result) CAMLreturn(Val_none);
+  if (!result) {
+    if (linenoiseWasInterrupted && raise_sys_break) {
+      caml_raise_constant(*caml_named_value("sys_break"));
+    } else {
+      CAMLreturn(Val_none);
+    }
+  }
   lnoise_result = caml_copy_string(result);
   linenoiseFree((void*)result);
   CAMLreturn(Val_some(lnoise_result));

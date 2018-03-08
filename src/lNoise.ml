@@ -11,6 +11,13 @@ external history_set_ : max_length:int -> int = "ml_history_set_maxlen"
 external history_save_ : filename:string -> int = "ml_history_save"
 external history_load_ : filename:string -> int = "ml_history_load"
 
+external catch_break : bool -> unit = "ml_catch_break"
+
+(* initialization: register [Sys.Break] and enable catch-break *)
+let () =
+  Callback.register_exception "sys_break" Sys.Break;
+  catch_break true
+
 let history_add h =
   if history_add_ h = 0 then Error "Couldn't add to history"
   else Ok ()
