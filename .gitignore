@@ -11,3 +11,5 @@ history.txt
 T
 setup.data
 setup.log
+*.install
+.merlin
