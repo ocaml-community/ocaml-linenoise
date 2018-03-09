@@ -679,6 +679,24 @@ void linenoiseEditMoveRight(struct linenoiseState *l) {
     }
 }
 
+/* Move cursor on the left */
+void linenoiseEditMovePrevWord(struct linenoiseState *l) {
+    while (l->pos > 0 && l->buf[l->pos-1] == ' ')
+        l->pos--;
+    while (l->pos > 0 && l->buf[l->pos-1] != ' ')
+        l->pos--;
+    refreshLine(l);
+}
+
+/* Move cursor on the right. */
+void linenoiseEditMoveNextWord(struct linenoiseState *l) {
+    while (l->pos < l->len && l->buf[l->pos-1] == ' ')
+        l->pos++;
+    while (l->pos < l->len && l->buf[l->pos-1] != ' ')
+        l->pos++;
+    refreshLine(l);
+}
+
 /* Move cursor to the start of the line. */
 void linenoiseEditMoveHome(struct linenoiseState *l) {
     if (l->pos != 0) {
@@ -797,7 +815,7 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
     while(1) {
         char c;
         int nread;
-        char seq[3];
+        char seq[5];
 
         nread = read(l.ifd,&c,1);
         if (nread <= 0) return l.len;
@@ -884,6 +902,20 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
                             linenoiseEditDelete(&l);
                             break;
                         }
+                    } else if (seq[2] == ';') {
+                      /* read additional 2 bytes */
+                      if (read(l.ifd,seq+3,1) == -1) break;
+                      if (read(l.ifd,seq+4,1) == -1) break;
+                      if (seq[3] == '5') {
+                        switch (seq[4]) {
+                          case 'D': /* ctrl-left */
+                            linenoiseEditMovePrevWord(&l);
+                            break;
+                          case 'C': /* ctrl-right */
+                            linenoiseEditMoveNextWord(&l);
+                            break;
+                        }
+                      }
                     }
                 } else {
                     switch(seq[1]) {
