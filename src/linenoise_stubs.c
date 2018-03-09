@@ -5,6 +5,8 @@
 #include <caml/fail.h>
 
 #include <errno.h>
+#include <assert.h>
+
 #include "linenoise_src.h"
 
 // Ripped from ctypes
@@ -38,10 +40,12 @@ CAMLprim value ml_add_completion(value completions, value new_completion)
   CAMLreturn(Val_unit);
 }
 
+static int has_completion_cb = 0, has_hints_cb = 0; /* callbacks set? */
 static value completion_cb, hints_cb;
 
 static void completion_bridge(const char *buf, linenoiseCompletions *lc)
 {
+  assert (has_completion_cb);
   caml_callback2(completion_cb, caml_copy_string(buf), (value)lc);
 }
 
@@ -49,6 +53,7 @@ static char *hints_bridge(const char *buf, int *color, int *bold)
 {
   CAMLparam0();
   CAMLlocal1(cb_result);
+  assert(has_hints_cb);
   cb_result = caml_callback(hints_cb, caml_copy_string(buf));
   if (cb_result == Val_none) {
     CAMLreturnT(char *,NULL);
@@ -63,10 +68,20 @@ static char *hints_bridge(const char *buf, int *color, int *bold)
 __attribute__((constructor))
 void set_free_hints(void) { linenoiseSetFreeHintsCallback(free); }
 
+/* Callbacks must be registered as global GC roots,
+ * search "global" in https://caml.inria.fr/pub/docs/manual-ocaml/intfc.html#sec439
+ */
+
 CAMLprim value ml_set_completion_cb(value completions)
 {
   CAMLparam1(completions);
-  completion_cb = completions;
+  if (has_completion_cb) {
+    caml_modify_generational_global_root(&completion_cb, completions);
+  } else {
+    has_completion_cb = 1;
+    completion_cb = completions;
+    caml_register_generational_global_root(&completion_cb);
+  }
   linenoiseSetCompletionCallback(completion_bridge);
   CAMLreturn(Val_unit);
 }
@@ -74,7 +89,13 @@ CAMLprim value ml_set_completion_cb(value completions)
 CAMLprim value ml_set_hints_cb(value hints)
 {
   CAMLparam1(hints);
-  hints_cb = hints;
+  if (has_hints_cb) {
+    caml_modify_generational_global_root(&hints_cb, hints);
+  } else {
+    has_hints_cb = 1;
+    hints_cb = hints;
+    caml_register_generational_global_root(&hints);
+  }
   linenoiseSetHintsCallback(hints_bridge);
   CAMLreturn(Val_unit);
 }
