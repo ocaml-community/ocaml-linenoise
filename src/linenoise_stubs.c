@@ -94,7 +94,7 @@ CAMLprim value ml_set_hints_cb(value hints)
   } else {
     has_hints_cb = 1;
     hints_cb = hints;
-    caml_register_generational_global_root(&hints);
+    caml_register_generational_global_root(&hints_cb);
   }
   linenoiseSetHintsCallback(hints_bridge);
   CAMLreturn(Val_unit);
