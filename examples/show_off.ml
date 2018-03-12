@@ -9,10 +9,12 @@ let rec user_input prompt cb =
 let () =
   (* LNoise.set_multiline true; *)
   let n = ref 0 in
+  let s = ref "foo" in
+  let get_s () = let x = !s in incr n; s := Printf.sprintf "foo%d" !n; x in
   LNoise.set_hints_callback (fun line ->
       if line <> "git remote add " then None
       else Some (incr n;
-                 " <this is the remote name> <this is the remote URL>" ^ string_of_int !n,
+                 " <this is the remote name> <this is the remote URL>" ^ get_s(),
                  LNoise.Yellow,
                  true)
     );
