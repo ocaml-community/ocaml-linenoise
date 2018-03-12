@@ -1,4 +1,5 @@
 let rec user_input prompt cb =
+  Gc.compact();
   match LNoise.linenoise prompt with
   | None -> ()
   | Some v ->
@@ -7,9 +8,11 @@ let rec user_input prompt cb =
 
 let () =
   (* LNoise.set_multiline true; *)
+  let n = ref 0 in
   LNoise.set_hints_callback (fun line ->
       if line <> "git remote add " then None
-      else Some (" <this is the remote name> <this is the remote URL>",
+      else Some (incr n;
+                 " <this is the remote name> <this is the remote URL>" ^ string_of_int !n,
                  LNoise.Yellow,
                  true)
     );
