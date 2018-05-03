@@ -42,7 +42,7 @@ val clear_screen : unit -> unit
 
 (** If [true], [ctrl-c] during a call to {!linenoise}
     will raise [Sys.Break] instead of returning an empty string.
-    @since NEXT_RELEASE *)
+    @since 1.1 *)
 val catch_break : bool -> unit
 
 (** Set if to use or not use the multi line mode. *)
