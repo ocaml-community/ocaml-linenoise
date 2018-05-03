@@ -12,5 +12,6 @@ build: ["jbuilder" "build" "@install" "-p" name]
 build-test: ["jbuilder" "runtest" "-p" name]
 depends: [
   "jbuilder" {build}
+  "result"
 ]
 available: [ ocaml-version >= "4.02.0" ]

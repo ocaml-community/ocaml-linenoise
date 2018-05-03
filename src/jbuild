@@ -7,5 +7,6 @@
    (wrapped false)
    (flags (:standard -w +a-4-40..42-44-45-48))
    (c_names (linenoise_src linenoise_stubs))
+   (libraries (result))
    ))
    
