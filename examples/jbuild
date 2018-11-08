@@ -1,4 +1,0 @@
-(executable
-  ((name show_off)
-   (libraries (linenoise))
-   ))
