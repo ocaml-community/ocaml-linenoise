@@ -1,16 +1,18 @@
-# -*- conf -*-
-opam-version: "1.2"
+opam-version: "2.0"
 name: "linenoise"
 version: "1.1.0"
+synopsis: "Lightweight readline alternative"
 maintainer: "Simon Cruanes"
-authors: [ "Edgar Aroutiounian <edgar.factorial@gmail.com>" ]
+authors: [ "Edgar Aroutiounian <edgar.factorial@gmail.com>" "Simon Cruanes" ]
 license: "BSD-3-clause"
 homepage: "https://github.com/fxfactorial/ocaml-linenoise"
-dev-repo: "https://github.com/fxfactorial/ocaml-linenoise.git"
+dev-repo: "git+https://github.com/fxfactorial/ocaml-linenoise.git"
 bug-reports: "https://github.com/fxfactorial/ocaml-linenoise/issues"
-build: ["jbuilder" "build" "@install" "-p" name]
-build-test: ["jbuilder" "runtest" "-p" name]
+build: [
+  ["dune" "build" "@install" "-p" name]
+  ["dune" "runtest" "-p" name] {with-test}
+]
 depends: [
-  "jbuilder" {build}
+  "dune" {build}
   "result"
 ]
