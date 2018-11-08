@@ -95,25 +95,25 @@ CAMLprim value ml_linenoise(value prompt)
 CAMLprim value ml_history_add(value line)
 {
   CAMLparam1(line);
-  CAMLreturn(linenoiseHistoryAdd(caml_strdup(String_val(line))));
+  CAMLreturn(Val_int(linenoiseHistoryAdd(caml_strdup(String_val(line)))));
 }
 
 CAMLprim value ml_history_set_maxlen(value max)
 {
   CAMLparam1(max);
-  CAMLreturn(caml_copy_nativeint(linenoiseHistorySetMaxLen(Int_val(max))));
+  CAMLreturn(Val_int(linenoiseHistorySetMaxLen(Int_val(max))));
 }
 
 CAMLprim value ml_history_save(value filename)
 {
   CAMLparam1(filename);
-  CAMLreturn(linenoiseHistorySave(caml_strdup(String_val(filename))));
+  CAMLreturn(Val_int(linenoiseHistorySave(caml_strdup(String_val(filename)))));
 }
 
 CAMLprim value ml_history_load(value filename)
 {
   CAMLparam1(filename);
-  CAMLreturn(linenoiseHistoryLoad(caml_strdup(String_val(filename))));
+  CAMLreturn(Val_int(linenoiseHistoryLoad(caml_strdup(String_val(filename)))));
 }
 
 CAMLprim value ml_clearscreen(__attribute__((unused))value unit)
