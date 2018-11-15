@@ -510,12 +510,17 @@ static void refreshSingleLine(struct linenoiseState *l, const char *prompt) {
     size_t pos = l->pos;
     struct abuf ab;
 
-    while((plen+pos) >= l->cols) {
+    if (plen >= l->cols) {
+      len=0; // not enough room
+      plen = l->cols;
+    }
+
+    while((plen+pos) >= l->cols && len>0) {
         buf++;
         len--;
         pos--;
     }
-    while (plen+len > l->cols) {
+    while (plen+len > l->cols && len>0) {
         len--;
     }
 
@@ -525,7 +530,8 @@ static void refreshSingleLine(struct linenoiseState *l, const char *prompt) {
     abAppend(&ab,seq,strlen(seq));
     /* Write the prompt and the current buffer content */
     abAppend(&ab,prompt,plen);
-    abAppend(&ab,buf,len);
+    if (len > 0)
+      abAppend(&ab,buf,len);
     /* Show hits if any. */
     refreshShowHints(&ab,l,plen);
     /* Erase to right */
@@ -793,12 +799,13 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
 
   int has_match = 1;
 
+  // backup of current input
   char *buf;
   {
     size_t len = 1+ strlen(l->buf);
     buf = malloc(len);
-    if (buf != NULL)
-      memcpy(buf, l->buf, len);
+    if (buf == NULL) return;
+    memcpy(buf, l->buf, len);
   }
 
   search_buf[0] = 0;
@@ -810,7 +817,12 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
     else
       prompt = "(reverse-i-search)`%s': ";
 
-    snprintf(search_prompt, sizeof(search_prompt), prompt, search_buf);
+    if (!snprintf(search_prompt, sizeof(search_prompt), prompt, search_buf)) {
+      linenoiseBeep();
+      break;
+    } else {
+      search_prompt[sizeof(search_prompt)-1] = 0; // crop
+    }
 
     l->pos = 0;
     refreshLinePrompt(l, search_prompt);
@@ -818,8 +830,13 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
     char c;
     int new_char = 0;
 
-    if (read(l->ifd, &c, 1) <= 0)
+    if (read(l->ifd, &c, 1) <= 0) {
+      l->pos = l->len = snprintf(l->buf, l->buflen, "%s", buf);
+      l->buf[l->buflen-1] = 0;
+      refreshLine(l);
+      free(buf);
       return;
+    }
 
     switch(c) {
     case BACKSPACE:
@@ -840,22 +857,25 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
       search_dir = 1;
       if (search_pos < 0)
         search_pos = 0;
+      break;
+    case ESC:
     case CTRL_G:
       l->pos = l->len = snprintf(l->buf, l->buflen, "%s", buf);
+      l->buf[l->buflen-1] = 0;
+      free(buf);
+      refreshLine(l);
+      return;
+    case ENTER:
+      free(buf);
+      l->pos = l->len;
       refreshLine(l);
       return;
     default:
-      if (c >= ' ') {
-        new_char = 1;
-        search_buf[search_len] = c;
-        search_buf[++search_len] = 0;
-        search_pos = history_len - 1;
-        break;
-      } else {
-        l->pos = l->len;
-        refreshLine(l);
-        return;
-      }
+      new_char = 1;
+      search_buf[search_len] = c;
+      search_buf[++search_len] = 0;
+      search_pos = history_len - 1;
+      break;
     }
 
     has_match = 0;
@@ -868,8 +888,12 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
           break;
         }
       }
-      if (!has_match)
+      if (!has_match) {
         linenoiseBeep();
+        // forbid writes if the line is too long
+        if (search_len > 0 && new_char && search_len+1 >= sizeof(search_buf))
+          search_buf[--search_len] = 0;
+      }
     }
   }
 }
