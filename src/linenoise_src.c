@@ -789,6 +789,9 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
   int search_len = 0;
   int search_pos = history_len - 1;
   int search_dir = -1;
+  char* prompt;
+
+  int has_match = 1;
 
   char *buf;
   {
@@ -802,7 +805,12 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
 
   while (1) {
 
-    snprintf(search_prompt, sizeof(search_prompt), "(reverse-i-search)`%s': ", search_buf);
+    if (!has_match)
+      prompt = "(failed-reverse-i-search)`%s': ";
+    else
+      prompt = "(reverse-i-search)`%s': ";
+
+    snprintf(search_prompt, sizeof(search_prompt), prompt, search_buf);
 
     l->pos = 0;
     refreshLinePrompt(l, search_prompt);
@@ -841,7 +849,7 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
       break;
     }
 
-    int has_match = 0;
+    has_match = 0;
 
     if (strlen(search_buf) > 0) {
       for (; search_pos >= 0 && search_pos < history_len; search_pos += search_dir) {
