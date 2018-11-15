@@ -178,6 +178,7 @@ enum KEY_ACTION{
 static void linenoiseAtExit(void);
 int linenoiseHistoryAdd(const char *line);
 static void refreshLine(struct linenoiseState *l);
+static void refreshLinePrompt(struct linenoiseState *l, const char *prompt);
 
 /* Debugging macro. */
 #if 0
@@ -502,9 +503,9 @@ void refreshShowHints(struct abuf *ab, struct linenoiseState *l, int plen) {
  *
  * Rewrite the currently edited line accordingly to the buffer content,
  * cursor position, and number of columns of the terminal. */
-static void refreshSingleLine(struct linenoiseState *l) {
+static void refreshSingleLine(struct linenoiseState *l, const char *prompt) {
     char seq[64];
-    size_t plen = strlen(l->prompt);
+    size_t plen = strlen(prompt);
     int fd = l->ofd;
     char *buf = l->buf;
     size_t len = l->len;
@@ -525,7 +526,7 @@ static void refreshSingleLine(struct linenoiseState *l) {
     snprintf(seq,64,"\r");
     abAppend(&ab,seq,strlen(seq));
     /* Write the prompt and the current buffer content */
-    abAppend(&ab,l->prompt,strlen(l->prompt));
+    abAppend(&ab,prompt,plen);
     abAppend(&ab,buf,len);
     /* Show hits if any. */
     refreshShowHints(&ab,l,plen);
@@ -543,14 +544,15 @@ static void refreshSingleLine(struct linenoiseState *l) {
  *
  * Rewrite the currently edited line accordingly to the buffer content,
  * cursor position, and number of columns of the terminal. */
-static void refreshMultiLine(struct linenoiseState *l) {
+static void refreshMultiLine(struct linenoiseState *l, const char *prompt) {
     char seq[64];
-    int plen = strlen(l->prompt);
+    int plen = strlen(prompt);
     int rows = (plen+l->len+l->cols-1)/l->cols; /* rows used by current buf. */
     int rpos = (plen+l->oldpos+l->cols)/l->cols; /* cursor relative row. */
     int rpos2; /* rpos after refresh. */
     int col; /* colum position, zero-based. */
     int old_rows = l->maxrows;
+    size_t pos = l->pos;
     int fd = l->ofd, j;
     struct abuf ab;
 
@@ -579,7 +581,7 @@ static void refreshMultiLine(struct linenoiseState *l) {
     abAppend(&ab,seq,strlen(seq));
 
     /* Write the prompt and the current buffer content */
-    abAppend(&ab,l->prompt,strlen(l->prompt));
+    abAppend(&ab,prompt,strlen(prompt));
     abAppend(&ab,l->buf,l->len);
 
     /* Show hits if any. */
@@ -587,9 +589,9 @@ static void refreshMultiLine(struct linenoiseState *l) {
 
     /* If we are at the very end of the screen with our prompt, we need to
      * emit a newline and move the prompt to the first column. */
-    if (l->pos &&
-        l->pos == l->len &&
-        (l->pos+plen) % l->cols == 0)
+    if (pos &&
+        pos == l->len &&
+        (pos+plen) % l->cols == 0)
     {
         lndebug("<newline>");
         abAppend(&ab,"\n",1);
@@ -600,7 +602,7 @@ static void refreshMultiLine(struct linenoiseState *l) {
     }
 
     /* Move cursor to right position. */
-    rpos2 = (plen+l->pos+l->cols)/l->cols; /* current cursor relative row. */
+    rpos2 = (plen+pos+l->cols)/l->cols; /* current cursor relative row. */
     lndebug("rpos2 %d", rpos2);
 
     /* Go up till we reach the expected positon. */
@@ -611,7 +613,7 @@ static void refreshMultiLine(struct linenoiseState *l) {
     }
 
     /* Set column. */
-    col = (plen+(int)l->pos) % (int)l->cols;
+    col = (plen+(int)pos) % (int)l->cols;
     lndebug("set col %d", 1+col);
     if (col)
         snprintf(seq,64,"\r\x1b[%dC", col);
@@ -620,7 +622,7 @@ static void refreshMultiLine(struct linenoiseState *l) {
     abAppend(&ab,seq,strlen(seq));
 
     lndebug("\n");
-    l->oldpos = l->pos;
+    l->oldpos = pos;
 
     if (write(fd,ab.b,ab.len) == -1) {} /* Can't recover from write error. */
     abFree(&ab);
@@ -628,11 +630,15 @@ static void refreshMultiLine(struct linenoiseState *l) {
 
 /* Calls the two low level functions refreshSingleLine() or
  * refreshMultiLine() according to the selected mode. */
-static void refreshLine(struct linenoiseState *l) {
+static void refreshLinePrompt(struct linenoiseState *l, const char *prompt) {
     if (mlmode)
-        refreshMultiLine(l);
+      refreshMultiLine(l, prompt);
     else
-        refreshSingleLine(l);
+      refreshSingleLine(l, prompt);
+}
+
+static void refreshLine(struct linenoiseState *l) {
+  refreshLinePrompt(l, l->prompt);
 }
 
 /* Insert the character 'c' at cursor current position.
