@@ -845,6 +845,7 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
       search_buf[++search_len] = 0;
       search_pos = history_len - 1;
     } else {
+      l->pos = l->len;
       refreshLine(l);
       break;
     }
