@@ -48,9 +48,6 @@
  * - Filter bogus Ctrl+<char> combinations.
  * - Win32 support
  *
- * Bloat:
- * - History search like Ctrl+r in readline?
- *
  * List of escape sequences used by this program, we do everything just
  * with three sequences. In order to be so cheap we may have some
  * flickering effect with some slow terminal, but the lesser sequences
@@ -160,6 +157,7 @@ enum KEY_ACTION{
 	CTRL_D = 4,         /* Ctrl-d */
 	CTRL_E = 5,         /* Ctrl-e */
 	CTRL_F = 6,         /* Ctrl-f */
+	CTRL_G = 7,         /* Ctrl-g */
 	CTRL_H = 8,         /* Ctrl-h */
 	TAB = 9,            /* Tab */
 	CTRL_K = 11,        /* Ctrl+k */
@@ -784,6 +782,80 @@ void linenoiseEditDeletePrevWord(struct linenoiseState *l) {
     refreshLine(l);
 }
 
+void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
+
+  char search_buf[LINENOISE_MAX_LINE];
+  char search_prompt[LINENOISE_MAX_LINE];
+  int search_len = 0;
+  int search_pos = history_len - 1;
+  int search_dir = -1;
+
+  char *buf;
+  {
+    size_t len = 1+ strlen(l->buf);
+    buf = malloc(len);
+    if (buf != NULL)
+      memcpy(buf, l->buf, len);
+  }
+
+  search_buf[0] = 0;
+
+  while (1) {
+
+    snprintf(search_prompt, sizeof(search_prompt), "(reverse-i-search)`%s': ", search_buf);
+
+    l->pos = 0;
+    refreshLinePrompt(l, search_prompt);
+
+    char c;
+    int new_char = 0;
+
+    if (read(l->ifd, &c, 1) <= 0)
+      return;
+
+    if (c == BACKSPACE || c == CTRL_H) {
+      if (search_len > 0) {
+        search_buf[--search_len] = 0;
+        search_pos = history_len - 1;
+      } else
+        linenoiseBeep();
+    } else if (c == CTRL_N || c == CTRL_R) {
+      search_dir = -1;
+    } else if (c == CTRL_P) {
+      search_dir = 1;
+    } else if (c == CTRL_G) {
+      l->pos = l->len = snprintf(l->buf, l->buflen, "%s", buf);
+      refreshLine(l);
+      break;
+    } else if (c >= ' ') {
+      new_char = 1;
+      search_buf[search_len] = c;
+      search_buf[++search_len] = 0;
+      search_pos = history_len - 1;
+    } else {
+      refreshLine(l);
+      break;
+    }
+
+    int has_match = 0;
+
+    if (strlen(search_buf) > 0) {
+      for (; search_pos >= 0 && search_pos < history_len && !has_match; search_pos += search_dir) {
+        if (strstr(history[search_pos], search_buf) && strcmp(history[search_pos], l->buf) != 0) {
+          has_match = 1;
+          l->len = snprintf(l->buf, l->buflen, "%s", history[search_pos]);
+        }
+      }
+
+      if (!has_match) {
+        linenoiseBeep();
+        if (search_len > 0 && new_char)
+          search_buf[--search_len] = 0;
+      }
+    }
+  }
+}
+
 /* This function is the core of the line editing capability of linenoise.
  * It expects 'fd' to be already in "raw mode" so that every key pressed
  * will be returned ASAP to read().
@@ -888,8 +960,8 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
         case CTRL_P:    /* ctrl-p */
             linenoiseEditHistoryNext(&l, LINENOISE_HISTORY_PREV);
             break;
-        case CTRL_R:    /* ctrl-p */
-            /* TODO: callback that is given all history and selects a line? */
+        case CTRL_R:    /* ctrl-r */
+            linenoiseReverseIncrementalSearch(&l);
             break;
         case CTRL_N:    /* ctrl-n */
             linenoiseEditHistoryNext(&l, LINENOISE_HISTORY_NEXT);
