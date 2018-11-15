@@ -840,10 +840,11 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
     int has_match = 0;
 
     if (strlen(search_buf) > 0) {
-      for (; search_pos >= 0 && search_pos < history_len && !has_match; search_pos += search_dir) {
-        if (strstr(history[search_pos], search_buf) && strcmp(history[search_pos], l->buf) != 0) {
+      for (; search_pos >= 0 && search_pos < history_len; search_pos += search_dir) {
+        if (strstr(history[search_pos], search_buf) && (new_char || strcmp(history[search_pos], l->buf))) {
           has_match = 1;
           l->len = snprintf(l->buf, l->buflen, "%s", history[search_pos]);
+          break;
         }
       }
 
