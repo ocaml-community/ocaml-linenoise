@@ -821,8 +821,12 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
         linenoiseBeep();
     } else if (c == CTRL_N || c == CTRL_R) {
       search_dir = -1;
+      if (search_pos >= history_len)
+        search_pos = history_len - 1;
     } else if (c == CTRL_P) {
       search_dir = 1;
+      if (search_pos < 0)
+        search_pos = 0;
     } else if (c == CTRL_G) {
       l->pos = l->len = snprintf(l->buf, l->buflen, "%s", buf);
       refreshLine(l);
