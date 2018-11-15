@@ -821,33 +821,41 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
     if (read(l->ifd, &c, 1) <= 0)
       return;
 
-    if (c == BACKSPACE || c == CTRL_H) {
+    switch(c) {
+    case BACKSPACE:
+    case CTRL_H:
       if (search_len > 0) {
         search_buf[--search_len] = 0;
         search_pos = history_len - 1;
       } else
         linenoiseBeep();
-    } else if (c == CTRL_N || c == CTRL_R) {
+      break;
+    case CTRL_N:
+    case CTRL_R:
       search_dir = -1;
       if (search_pos >= history_len)
         search_pos = history_len - 1;
-    } else if (c == CTRL_P) {
+      break;
+    case CTRL_P:
       search_dir = 1;
       if (search_pos < 0)
         search_pos = 0;
-    } else if (c == CTRL_G) {
+    case CTRL_G:
       l->pos = l->len = snprintf(l->buf, l->buflen, "%s", buf);
       refreshLine(l);
-      break;
-    } else if (c >= ' ') {
-      new_char = 1;
-      search_buf[search_len] = c;
-      search_buf[++search_len] = 0;
-      search_pos = history_len - 1;
-    } else {
-      l->pos = l->len;
-      refreshLine(l);
-      break;
+      return;
+    default:
+      if (c >= ' ') {
+        new_char = 1;
+        search_buf[search_len] = c;
+        search_buf[++search_len] = 0;
+        search_pos = history_len - 1;
+        break;
+      } else {
+        l->pos = l->len;
+        refreshLine(l);
+        return;
+      }
     }
 
     has_match = 0;
