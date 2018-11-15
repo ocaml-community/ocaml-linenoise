@@ -868,12 +868,8 @@ void linenoiseReverseIncrementalSearch(struct linenoiseState *l) {
           break;
         }
       }
-
-      if (!has_match) {
+      if (!has_match)
         linenoiseBeep();
-        if (search_len > 0 && new_char)
-          search_buf[--search_len] = 0;
-      }
     }
   }
 }
