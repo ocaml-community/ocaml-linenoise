@@ -1,14 +1,17 @@
 Linenoise in OCaml
 --------------------
 
+[![Build status](https://api.travis-ci.com/ocaml-community/ocaml-linenoise.svg?branch=master)](https://travis-ci.com/ocaml-community/ocaml-linenoise)
+
 # Benefits
 1. BSD licensed.
 2. No system dependencies, no need for `readline` on your machine.
 3. Related to 2, these bindings are self-contained, the source for
    `linenoise` is in this repo and compiled all together with the
    `OCaml`.
-4. Written in OCaml.
+4. Written in OCaml + C.
 5. Pretty cool hints feature, see the gif.
+6. Additional features compared to linenoise, such as history search
 
 # Installation
 
@@ -19,7 +22,7 @@ $ opam install linenoise
 ```
 
 See the pretty
-documentation [here](http://hyegar.com/ocaml-linenoise/LNoise.html)
+documentation [here](http://ocaml-community.github.io/ocaml-linenoise/LNoise.html)
 
 # Example code
 This example is also included in the repo under examples:
