@@ -5,9 +5,9 @@ synopsis: "Lightweight readline alternative"
 maintainer: "Simon Cruanes"
 authors: [ "Edgar Aroutiounian <edgar.factorial@gmail.com>" "Simon Cruanes" ]
 license: "BSD-3-clause"
-homepage: "https://github.com/fxfactorial/ocaml-linenoise"
-dev-repo: "git+https://github.com/fxfactorial/ocaml-linenoise.git"
-bug-reports: "https://github.com/fxfactorial/ocaml-linenoise/issues"
+homepage: "https://github.com/ocaml-community/ocaml-linenoise"
+dev-repo: "git+https://github.com/ocaml-community/ocaml-linenoise.git"
+bug-reports: "https://github.com/ocaml-community/ocaml-linenoise/issues"
 build: [
   ["dune" "build" "@install" "-p" name]
   ["dune" "runtest" "-p" name] {with-test}
