@@ -11,8 +11,10 @@ bug-reports: "https://github.com/ocaml-community/ocaml-linenoise/issues"
 build: [
   ["dune" "build" "@install" "-p" name]
   ["dune" "runtest" "-p" name] {with-test}
+  ["dune" "build" "@doc" "-p" name] {with-doc}
 ]
 depends: [
   "dune" {build}
   "result"
+  "odoc" {with-doc}
 ]
