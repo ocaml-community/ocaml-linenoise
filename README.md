@@ -22,7 +22,7 @@ $ opam install linenoise
 ```
 
 See the pretty
-documentation [here](http://ocaml-community.github.io/ocaml-linenoise/LNoise.html)
+documentation [here](https://ocaml-community.github.io/ocaml-linenoise/)
 
 # Example code
 This example is also included in the repo under examples:
