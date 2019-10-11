@@ -14,7 +14,7 @@ build: [
   ["dune" "build" "@doc" "-p" name] {with-doc}
 ]
 depends: [
-  "dune" {build}
+  "dune"
   "result"
   "odoc" {with-doc}
 ]
