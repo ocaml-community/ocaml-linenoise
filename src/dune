@@ -4,8 +4,7 @@
   (public_name linenoise)
   (modules LNoise)
   (wrapped false)
-  (flags :standard -w +a-4-40..42-44-45-48@8)
+  (flags :standard -warn-error -3)
   (c_names linenoise_src linenoise_stubs)
-  (libraries result)
-)
+  (libraries result))
    
