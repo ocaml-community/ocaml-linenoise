@@ -43,7 +43,7 @@
 extern "C" {
 #endif
 
-int linenoiseWasInterrupted; /* boolean signalling if last call was ctrl-c */
+extern int linenoiseWasInterrupted; /* boolean signalling if last call was ctrl-c */
 
 typedef struct linenoiseCompletions {
   size_t len;
