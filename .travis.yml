@@ -9,7 +9,8 @@ env:
   - DISTRO="ubuntu-16.04"
   matrix:
   - PACKAGE="linenoise" OCAML_VERSION="4.03"
-  - PACKAGE="linenoise" OCAML_VERSION="4.05"
-  - PACKAGE="linenoise" OCAML_VERSION="4.06"
+  #- PACKAGE="linenoise" OCAML_VERSION="4.05"
+  #- PACKAGE="linenoise" OCAML_VERSION="4.06"
   - PACKAGE="linenoise" OCAML_VERSION="4.08"
   - PACKAGE="linenoise" OCAML_VERSION="4.09"
+  - PACKAGE="linenoise" OCAML_VERSION="4.10"
