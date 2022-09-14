@@ -1012,12 +1012,15 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
             /* Read the next byte representing the escape sequence */
             if (read(l.ifd,seq,1) == -1) break;
 
-            /* alt-b, alt-f */
+            /* alt-b, alt-f, alt-backspace */
             if (seq[0] == 'b') {
                 linenoiseEditMovePrevWord(&l);
                 break;
             } else if (seq[0] == 'f') {
                 linenoiseEditMoveNextWord(&l);
+                break;
+            } else if (seq[0] == 127) { /* backspace */
+                linenoiseEditDeletePrevWord(&l);
                 break;
             }
 
