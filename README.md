@@ -1,7 +1,7 @@
 Linenoise in OCaml
 --------------------
 
-[![Build status](https://api.travis-ci.com/ocaml-community/ocaml-linenoise.svg?branch=master)](https://travis-ci.com/ocaml-community/ocaml-linenoise)
+[![build](https://github.com/ocaml-community/ocaml-linenoise/actions/workflows/main.yml/badge.svg)](https://github.com/ocaml-community/ocaml-linenoise/actions/workflows/main.yml)
 
 # Benefits
 1. BSD licensed.
