@@ -772,7 +772,7 @@ void linenoiseEditBackspace(struct linenoiseState *l) {
     }
 }
 
-/* Delete the previosu word, maintaining the cursor at the start of the
+/* Delete the previous word, maintaining the cursor at the start of the
  * current word. */
 void linenoiseEditDeletePrevWord(struct linenoiseState *l) {
     size_t old_pos = l->pos;
@@ -784,6 +784,21 @@ void linenoiseEditDeletePrevWord(struct linenoiseState *l) {
         l->pos--;
     diff = old_pos - l->pos;
     memmove(l->buf+l->pos,l->buf+old_pos,l->len-old_pos+1);
+    l->len -= diff;
+    refreshLine(l);
+}
+
+/* Delete the next word, maintaining the cursor at the same position */
+void linenoiseEditDeleteNextWord(struct linenoiseState *l) {
+    size_t next_pos = l->pos;
+    size_t diff;
+
+    while (next_pos < l->len && l->buf[next_pos] == ' ')
+        next_pos++;
+    while (next_pos < l->len && l->buf[next_pos] != ' ')
+        next_pos++;
+    diff = next_pos - l->pos;
+    memmove(l->buf+l->pos,l->buf+next_pos,l->len-next_pos+1);
     l->len -= diff;
     refreshLine(l);
 }
@@ -1009,10 +1024,25 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
             linenoiseEditHistoryNext(&l, LINENOISE_HISTORY_NEXT);
             break;
         case ESC:    /* escape sequence */
-            /* Read the next two bytes representing the escape sequence.
-             * Use two calls to handle slow terminals returning the two
-             * chars at different times. */
+            /* Read the next byte representing the escape sequence */
             if (read(l.ifd,seq,1) == -1) break;
+
+            /* alt-b, alt-f, alt-d, alt-backspace */
+            if (seq[0] == 'b') {
+                linenoiseEditMovePrevWord(&l);
+                break;
+            } else if (seq[0] == 'f') {
+                linenoiseEditMoveNextWord(&l);
+                break;
+            } else if (seq[0] == 'd') {
+                linenoiseEditDeleteNextWord(&l);
+                break;
+            } else if (seq[0] == 127) { /* backspace */
+                linenoiseEditDeletePrevWord(&l);
+                break;
+            }
+
+            /* Read a second byte */
             if (read(l.ifd,seq+1,1) == -1) break;
 
             /* ESC [ sequences. */
