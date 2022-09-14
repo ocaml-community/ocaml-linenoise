@@ -1009,10 +1009,19 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
             linenoiseEditHistoryNext(&l, LINENOISE_HISTORY_NEXT);
             break;
         case ESC:    /* escape sequence */
-            /* Read the next two bytes representing the escape sequence.
-             * Use two calls to handle slow terminals returning the two
-             * chars at different times. */
+            /* Read the next byte representing the escape sequence */
             if (read(l.ifd,seq,1) == -1) break;
+
+            /* alt-b, alt-f */
+            if (seq[0] == 'b') {
+                linenoiseEditMovePrevWord(&l);
+                break;
+            } else if (seq[0] == 'f') {
+                linenoiseEditMoveNextWord(&l);
+                break;
+            }
+
+            /* Read a second byte */
             if (read(l.ifd,seq+1,1) == -1) break;
 
             /* ESC [ sequences. */
