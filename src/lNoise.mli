@@ -22,20 +22,20 @@ val set_completion_callback : (string -> completions -> unit) -> unit
 val linenoise : string -> string option
 
 (** Add a string to the history *)
-val history_add : string -> (unit, string) Result.result
+val history_add : string -> (unit, string) result
 
 (** Set the maximum length for the history. This function can be
     called even if there is already some history, the function will
     make sure to retain just the latest 'len' elements if the new
     history length value is smaller than the amount of items already
     inside the history. *)
-val history_set : max_length:int -> (unit, string) Result.result
+val history_set : max_length:int -> (unit, string) result
 
 (** Save the history in the specified file *)
-val history_save : filename:string -> (unit, string) Result.result
+val history_save : filename:string -> (unit, string) result
 
 (** Load the history from the specified file. *)
-val history_load : filename:string -> (unit, string) Result.result
+val history_load : filename:string -> (unit, string) result
 
 (** Clear the screen; used to handle CTRL+L *)
 val clear_screen : unit -> unit

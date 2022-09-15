@@ -10,12 +10,11 @@ dev-repo: "git+https://github.com/ocaml-community/ocaml-linenoise.git"
 bug-reports: "https://github.com/ocaml-community/ocaml-linenoise/issues"
 build: [
   ["dune" "build" "@install" "-p" name "-j" jobs]
-  ["dune" "runtest" "-p" name] {with-test}
-  ["dune" "build" "@doc" "-p" name] {with-doc}
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
+  ["dune" "build" "@doc" "-p" name "-j" jobs] {with-doc}
 ]
 depends: [
   "dune" { >= "1.1" }
-  "result"
   "ocaml" { >= "4.03.0" }
   "odoc" {with-doc}
 ]

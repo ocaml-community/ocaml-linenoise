@@ -1,5 +1,3 @@
-open Result
-
 type completions
 
 external add_completion : completions -> string -> unit = "ml_add_completion"

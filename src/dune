@@ -5,6 +5,5 @@
   (modules LNoise)
   (wrapped false)
   (flags :standard -warn-error -3)
-  (c_names linenoise_src linenoise_stubs)
-  (libraries result))
+  (c_names linenoise_src linenoise_stubs))
    
