@@ -1,4 +1,3 @@
-open Result
 
 type completions
 
