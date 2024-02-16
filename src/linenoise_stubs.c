@@ -3,6 +3,7 @@
 #include <caml/memory.h>
 #include <caml/callback.h>
 #include <caml/fail.h>
+#include <caml/threads.h>
 
 #include <errno.h>
 #include <assert.h>
@@ -43,12 +44,15 @@ CAMLprim value ml_add_completion(value completions, value new_completion)
 
 static void completion_bridge(const char *buf, linenoiseCompletions *lc)
 {
+  caml_acquire_runtime_system();
   value str_copy = caml_copy_string(buf);
   caml_callback2(*caml_named_value("lnoise_completion_cb"), str_copy, (value)lc);
+  caml_release_runtime_system();
 }
 
 static char *hints_bridge(const char *buf, int *color, int *bold)
 {
+  caml_acquire_runtime_system();
   CAMLparam0();
   CAMLlocal2(str_copy, cb_result);
 
@@ -56,17 +60,21 @@ static char *hints_bridge(const char *buf, int *color, int *bold)
 
   cb_result = caml_callback(*caml_named_value("lnoise_hints_cb"), str_copy);
   if (cb_result == Val_none) {
+    caml_release_runtime_system();
     CAMLreturnT(char *,NULL);
   } else {
     char* msg = caml_stat_strdup(String_val(Field(Field(cb_result, 0), 0)));
     *color = Int_val(Field(Field(cb_result, 0), 1)) + 31;
     *bold = Bool_val(Field(Field(cb_result, 0), 2));
+    caml_release_runtime_system();
     CAMLreturnT(char *,msg);
   }
 }
 
 static void free_hints_bridge(void* data) {
+  caml_acquire_runtime_system();
   caml_stat_free(data);
+  caml_release_runtime_system();
 }
 
 __attribute__((constructor))
@@ -88,7 +96,9 @@ CAMLprim value ml_linenoise(value prompt)
   linenoiseWasInterrupted = 0; // reset
   char* c_prompt = caml_stat_strdup(String_val(prompt));
 
+  caml_release_runtime_system();
   const char *result = linenoise(c_prompt);
+  caml_acquire_runtime_system();
 
   caml_stat_free(c_prompt);
   if (!result) {
