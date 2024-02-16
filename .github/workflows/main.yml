@@ -16,12 +16,14 @@ jobs:
         ocaml-compiler:
           - 4.03.x
           - 4.14.x
+          - 5.1.x
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - uses: ocaml/setup-ocaml@v2
       with:
         ocaml-compiler: ${{ matrix.ocaml-compiler }}
+        allow-prerelease-opam: true
     - run: opam pin -n .
     - run: opam depext -yt linenoise
     - run: opam install -t . --deps-only
