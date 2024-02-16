@@ -35,8 +35,9 @@ CAMLprim value ml_catch_break(value flag)
 CAMLprim value ml_add_completion(value completions, value new_completion)
 {
   CAMLparam2(completions, new_completion);
-  linenoiseAddCompletion((linenoiseCompletions *)completions,
-			 caml_strdup(String_val(new_completion)));
+  char* c_new_completion = caml_stat_strdup(String_val(new_completion));
+  linenoiseAddCompletion((linenoiseCompletions *)completions, c_new_completion);
+  caml_stat_free(c_new_completion);
   CAMLreturn(Val_unit);
 }
 
@@ -57,11 +58,15 @@ static char *hints_bridge(const char *buf, int *color, int *bold)
   if (cb_result == Val_none) {
     CAMLreturnT(char *,NULL);
   } else {
-    char *msg = caml_strdup(String_val(Field(Field(cb_result, 0), 0)));
+    char* msg = caml_stat_strdup(String_val(Field(Field(cb_result, 0), 0)));
     *color = Int_val(Field(Field(cb_result, 0), 1)) + 31;
     *bold = Bool_val(Field(Field(cb_result, 0), 2));
     CAMLreturnT(char *,msg);
   }
+}
+
+static void free_hints_bridge(void* data) {
+  caml_stat_free(data);
 }
 
 __attribute__((constructor))
@@ -71,6 +76,7 @@ CAMLprim value ml_setup_bridges(value unit) {
   CAMLparam1(unit);
   linenoiseSetCompletionCallback(completion_bridge);
   linenoiseSetHintsCallback(hints_bridge);
+  linenoiseSetFreeHintsCallback(free_hints_bridge);
   CAMLreturn(Val_unit);
 }
 
@@ -78,8 +84,13 @@ CAMLprim value ml_linenoise(value prompt)
 {
   CAMLparam1(prompt);
   CAMLlocal1(lnoise_result);
+
   linenoiseWasInterrupted = 0; // reset
-  const char *result = linenoise(caml_strdup(String_val(prompt)));
+  char* c_prompt = caml_stat_strdup(String_val(prompt));
+
+  const char *result = linenoise(c_prompt);
+
+  caml_stat_free(c_prompt);
   if (!result) {
     if (linenoiseWasInterrupted && raise_sys_break) {
       caml_raise_constant(*caml_named_value("sys_break"));
@@ -95,7 +106,10 @@ CAMLprim value ml_linenoise(value prompt)
 CAMLprim value ml_history_add(value line)
 {
   CAMLparam1(line);
-  CAMLreturn(Val_int(linenoiseHistoryAdd(caml_strdup(String_val(line)))));
+  char* c_line = caml_stat_strdup(String_val(line));
+  int res = linenoiseHistoryAdd(c_line);
+  caml_stat_free(c_line);
+  CAMLreturn(Val_int(res));
 }
 
 CAMLprim value ml_history_set_maxlen(value max)
@@ -107,13 +121,19 @@ CAMLprim value ml_history_set_maxlen(value max)
 CAMLprim value ml_history_save(value filename)
 {
   CAMLparam1(filename);
-  CAMLreturn(Val_int(linenoiseHistorySave(caml_strdup(String_val(filename)))));
+  char* c_filename = caml_stat_strdup(String_val(filename));
+  int res = linenoiseHistorySave(c_filename);
+  caml_stat_free(c_filename);
+  CAMLreturn(Val_int(res));
 }
 
 CAMLprim value ml_history_load(value filename)
 {
   CAMLparam1(filename);
-  CAMLreturn(Val_int(linenoiseHistoryLoad(caml_strdup(String_val(filename)))));
+  char* c_filename= caml_stat_strdup(String_val(filename));
+  int res = linenoiseHistoryLoad(c_filename);
+  caml_stat_free(c_filename);
+  CAMLreturn(Val_int(res));
 }
 
 CAMLprim value ml_clearscreen(__attribute__((unused))value unit)
