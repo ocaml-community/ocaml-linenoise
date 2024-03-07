@@ -59,9 +59,8 @@ static void completion_bridge(const char *buf, linenoiseCompletions *lc)
   caml_release_runtime_system();
 }
 
-static char *hints_bridge(const char *buf, int *color, int *bold)
+static char *hints_bridge_inner(const char *buf, int *color, int *bold)
 {
-  caml_acquire_runtime_system();
   CAMLparam0();
   CAMLlocal2(str_copy, cb_result);
 
@@ -69,16 +68,23 @@ static char *hints_bridge(const char *buf, int *color, int *bold)
 
   cb_result = caml_callback(*caml_named_value("lnoise_hints_cb"), str_copy);
   if (cb_result == Val_none) {
-    caml_release_runtime_system();
     CAMLreturnT(char *,NULL);
   } else {
     char* msg = caml_stat_strdup(String_val(Field(Field(cb_result, 0), 0)));
     *color = Int_val(Field(Field(cb_result, 0), 1)) + 31;
     *bold = Bool_val(Field(Field(cb_result, 0), 2));
-    caml_release_runtime_system();
     CAMLreturnT(char *,msg);
   }
 }
+
+static char *hints_bridge(const char *buf, int *color, int *bold)
+{
+  caml_acquire_runtime_system();
+  char* res = hints_bridge_inner(buf, color, bold);
+  caml_release_runtime_system();
+  return res;
+}
+
 
 static void free_hints_bridge(void* data) {
   caml_acquire_runtime_system();
