@@ -42,11 +42,20 @@ CAMLprim value ml_add_completion(value completions, value new_completion)
   CAMLreturn(Val_unit);
 }
 
+// this bridge runs with the runtime lock acquired
+static void completion_bridge_inner(const char *buf, linenoiseCompletions *lc)
+{
+  CAMLparam0();
+  CAMLlocal1(str_copy);
+  str_copy = caml_copy_string(buf);
+  caml_callback2(*caml_named_value("lnoise_completion_cb"), str_copy, (value)lc);
+  CAMLreturn0;
+}
+
 static void completion_bridge(const char *buf, linenoiseCompletions *lc)
 {
   caml_acquire_runtime_system();
-  value str_copy = caml_copy_string(buf);
-  caml_callback2(*caml_named_value("lnoise_completion_cb"), str_copy, (value)lc);
+  completion_bridge_inner(buf, lc);
   caml_release_runtime_system();
 }
 
