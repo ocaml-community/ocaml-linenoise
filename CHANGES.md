@@ -1,3 +1,7 @@
+# 1.5.1
+
+- fix a deadlock from 1.5
+
 # 1.5
 
 - release runtime lock when calling `lnoise`
